@@ -1,63 +1,44 @@
 #include <stdio.h>
 
-// Desafio Batalha Naval - MateCheck
-// Este código inicial serve como base para o desenvolvimento do sistema de Batalha Naval.
-// Siga os comentários para implementar cada parte do desafio.
+#define SIZE 12
+
+void printBoard(int board[SIZE][SIZE])
+{
+    for (int row = 0; row < SIZE; row++)
+    {
+        for (int column = 0; column < SIZE; column++)
+        {
+            printf("%d ", board[row][column]);
+        }
+        printf(" \n");
+    }
+};
 
 int main()
 {
+    // Definindo o tabuleiro
+    int board[SIZE][SIZE] = {0};
 
-    int board[5][5] =
-        {
-            {0, 0, 3, 0, 0},
-            {0, 0, 3, 0, 0},
-            {0, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0},
-            {0, 3, 3, 0, 0},
-        };
+    // Posição do navio 1
+    int ship_1[3][2] = {{0, 2}, {1, 2}, {2, 2}};
 
+    // Posição do navio 2
+    int ship_2[3][2] = {{8, 3}, {8, 4}, {8, 5}};
 
-    for (int i = 0; i < 5; i++)
+    // Posição do navio 3
+    int ship_3[3][2] = {{3, 5}, {4, 6}, {5, 7}};
+
+    // Posicionando os navios
+    for (int i = 0; i < 3; i++)
     {
-        for (int j = 0; j < 5; j++)
-        {
-            if (board[i][j] == 3)
-            {
-                printf("Posicao: [%d, %d] \n", i, j);
-            }
-        }
+        board[ship_1[i][0]][ship_1[i][1]] = 3;
+        board[ship_2[i][0]][ship_2[i][1]] = 3;
+        board[ship_3[i][0]][ship_3[i][1]] = 3;
     }
 
-    // Nível Novato - Posicionamento dos Navios
-    // Sugestão: Declare uma matriz bidimensional para representar o tabuleiro (Ex: int tabuleiro[5][5];).
-    // Sugestão: Posicione dois navios no tabuleiro, um verticalmente e outro horizontalmente.
-    // Sugestão: Utilize `printf` para exibir as coordenadas de cada parte dos navios.
+   
 
-    // Nível Aventureiro - Expansão do Tabuleiro e Posicionamento Diagonal
-    // Sugestão: Expanda o tabuleiro para uma matriz 10x10.
-    // Sugestão: Posicione quatro navios no tabuleiro, incluindo dois na diagonal.
-    // Sugestão: Exiba o tabuleiro completo no console, mostrando 0 para posições vazias e 3 para posições ocupadas.
-
-    // Nível Mestre - Habilidades Especiais com Matrizes
-    // Sugestão: Crie matrizes para representar habilidades especiais como cone, cruz, e octaedro.
-    // Sugestão: Utilize estruturas de repetição aninhadas para preencher as áreas afetadas por essas habilidades no tabuleiro.
-    // Sugestão: Exiba o tabuleiro com as áreas afetadas, utilizando 0 para áreas não afetadas e 1 para áreas atingidas.
-
-    // Exemplos de exibição das habilidades:
-    // Exemplo para habilidade em cone:
-    // 0 0 1 0 0
-    // 0 1 1 1 0
-    // 1 1 1 1 1
-
-    // Exemplo para habilidade em octaedro:
-    // 0 0 1 0 0
-    // 0 1 1 1 0
-    // 0 0 1 0 0
-
-    // Exemplo para habilidade em cruz:
-    // 0 0 1 0 0
-    // 1 1 1 1 1
-    // 0 0 1 0 0
+    printBoard(board);
 
     return 0;
 }
