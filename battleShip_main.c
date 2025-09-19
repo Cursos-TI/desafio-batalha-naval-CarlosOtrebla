@@ -11,8 +11,8 @@ int main()
     int option;
     int optionPosition;
 
-    int ship_1[5][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}, {0, 0}}; // Navio 1
-    int ship_2[4][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}};         // Navio 2
+    int ship_1[4][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}}; // Navio 1
+    int ship_2[4][2] = {{0, 0}, {0, 0}, {0, 0}, {0, 0}}; // Navio 2
 
     do
     {
@@ -79,7 +79,7 @@ int main()
         }
 
         default:
-        if (option != 0)
+            if (option != 0)
                 printf("Opção inválida!\n");
             break;
         }

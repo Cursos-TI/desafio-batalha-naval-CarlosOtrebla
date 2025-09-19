@@ -27,5 +27,7 @@ int canPlaceShip(int board[ROW][COLUMN], int ship[][2], int ship_size);
 int placeShip(int board[ROW][COLUMN], int ship[][2], int ship_size, int ship_id);
 void printBoard(int board[ROW][COLUMN]);
 void printShipPositions(int ship[][2], int ship_size, int ship_id);
+int isShipSunk(int board[ROW][COLUMN], int ship[][2], int ship_size, int ship_id);
+int isGameOver(int board[ROW][COLUMN]);
 
 #endif // BATTLESHIP_H
