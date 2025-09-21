@@ -5,6 +5,7 @@
 #include <locale.h>
 #include <string.h>
 #include <windows.h>
+#include <ctype.h>
 
 // Definindo o tamanho do tabuleiro
 #define ROW 10
@@ -17,17 +18,16 @@ extern char nameColumn[];
 extern int aircraftCarrier[5];
 extern int battleship[4];
 extern int cruiser[3];
-extern int submarine[3];
 extern int destroyer[2];
 
 // Declaração das funções
 int positionIsValid(int row, int column, int board_size);
-void clearBoard(int board[ROW][COLUMN]);
 int canPlaceShip(int board[ROW][COLUMN], int ship[][2], int ship_size);
-int placeShip(int board[ROW][COLUMN], int ship[][2], int ship_size, int ship_id);
+void clearBoard(int board[ROW][COLUMN]);
 void printBoard(int board[ROW][COLUMN]);
-void printShipPositions(int ship[][2], int ship_size, int ship_id);
 int isShipSunk(int board[ROW][COLUMN], int ship[][2], int ship_size, int ship_id);
 int isGameOver(int board[ROW][COLUMN]);
+void printShipPositions(int ship[][2], int ship_size, int ship_id);
+int placeShip(int board[ROW][COLUMN], int ship[][2], int ship_size, int ship_id);
 
 #endif // BATTLESHIP_H
