@@ -29,5 +29,8 @@ int isShipSunk(int board[ROW][COLUMN], int ship[][2], int ship_size, int ship_id
 int isGameOver(int board[ROW][COLUMN]);
 void printShipPositions(int ship[][2], int ship_size, int ship_id);
 int placeShip(int board[ROW][COLUMN], int ship[][2], int ship_size, int ship_id);
+int positionShipInteractive(int board[ROW][COLUMN], int orientation, 
+                           int *positioned_destroyer, int *positioned_cruiser, 
+                           int *positioned_battleship, int *positioned_aircraft_carrier);
 
 #endif // BATTLESHIP_H
