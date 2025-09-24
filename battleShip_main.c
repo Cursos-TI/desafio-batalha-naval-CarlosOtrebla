@@ -1,5 +1,4 @@
 #include "battleShip.h"
-#include <ctype.h> // Para usar toupper()
 
 int main()
 {
@@ -25,7 +24,6 @@ int main()
     do
     {
         printBoard(board);
-        // printBothBoards(board, attack_board);
 
         // Calcula quantos navios foram posicionados
         int total_ships = positioned_destroyer + positioned_cruiser + positioned_battleship + positioned_aircraft_carrier;
@@ -61,7 +59,7 @@ int main()
 
             if (total_ships >= max_ships)
             {
-                printf("\n✅ TODOS OS NAVIOS JÁ FORAM POSICIONADOS!\n");
+                printf("\nTODOS OS NAVIOS JÁ FORAM POSICIONADOS!\n");
                 printf("\n=== STATUS COMPLETO ===\n");
                 printf("Destroyers (2 casas):     %d/2 posicionados ✓\n", positioned_destroyer);
                 printf("Cruzadores (3 casas):     %d/2 posicionados ✓\n", positioned_cruiser);
@@ -83,7 +81,7 @@ int main()
                 total_ships = positioned_destroyer + positioned_cruiser + positioned_battleship + positioned_aircraft_carrier;
                 if (total_ships >= max_ships)
                 {
-                    printf("\n🎉 PARABÉNS! TODOS OS NAVIOS FORAM POSICIONADOS!\n");
+                    printf("\nPARABÉNS! TODOS OS NAVIOS FORAM POSICIONADOS!\n");
                     printf("Retornando ao menu principal...\n");
                     printf("\nPressione Enter para continuar...");
                     clearInputBuffer();
@@ -148,9 +146,9 @@ int main()
 
         case 3: // Atacar (modo teste)
         {
-            printf("\n🚀 ====== MODO DE ATAQUE (TESTE) ======\n\n");
-            printf("🎯 Teste seus ataques especiais nos seus próprios navios!\n");
-            printf("💡 Experimente os diferentes tipos de ataque:\n");
+            printf("\n====== MODO DE ATAQUE (TESTE) ======\n\n");
+            printf("   Teste seus ataques especiais nos seus próprios navios!\n");
+            printf("   Experimente os diferentes tipos de ataque:\n");
             printf("   • Ataque Simples: Precisão máxima\n");
             printf("   • Ataque em Cone: Área triangular\n");
             printf("   • Ataque em Cruz: 5 posições (+)\n");
@@ -163,7 +161,7 @@ int main()
 
                 if (attack_result == -1)
                 {
-                    printf("\n❌ Erro no ataque! Tente novamente.\n");
+                    printf("\n  Erro no ataque! Tente novamente.\n");
                     printf("Pressione Enter para continuar...");
                     clearInputBuffer();
                     getchar();
@@ -174,7 +172,7 @@ int main()
                 }
                 else if (attack_result > 0)
                 {
-                    printf("\n🎉 Sucesso! Deseja fazer outro ataque? (s/n): ");
+                    printf("\nSucesso! Deseja fazer outro ataque? (s/n): ");
                     char continue_attack;
                     scanf(" %c", &continue_attack);
                     if (continue_attack != 's' && continue_attack != 'S')

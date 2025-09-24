@@ -7,16 +7,6 @@ char nameColumn[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'};
 // Tabuleiro de ataques
 char attack_board[ROW][COLUMN];
 
-// Definindo os tipos de navios
-
-int aircraftCarrier[5];
-int battleship[4];
-int submarine[3];
-int cruiser[3];
-int destroyer[2];
-
-// =================== FUNÇÕES DE ATAQUES ESPECIAIS ===================
-
 // Função auxiliar para limpar buffer de entrada
 void clearInputBuffer()
 {
@@ -191,7 +181,7 @@ int performOctahedronAttack(int target_board[ROW][COLUMN], char attack_board[ROW
                 else // Água
                 {
                     attack_board[current_row][current_col] = MISS;
-                    printf("💧 Água em %c%d (%s)\n", nameColumn[current_col], current_row + 1, dir_names[i]);
+                    printf("Água em %c%d (%s)\n", nameColumn[current_col], current_row + 1, dir_names[i]);
                 }
             }
             else
@@ -372,18 +362,7 @@ int positionIsValid(int row, int column, int board_size)
     return (row >= 0 && row < board_size && column >= 0 && column < board_size);
 }
 
-// Função para limpar o tabuleiro
 
-void clearBoard(int board[ROW][COLUMN])
-{
-    for (int i = 0; i < ROW; i++)
-    {
-        for (int j = 0; j < COLUMN; j++)
-        {
-            board[i][j] = 0;
-        }
-    }
-}
 
 // Função para verificar se o navio pode ser posicionado
 
@@ -971,52 +950,11 @@ int attackMenu(int target_board[ROW][COLUMN], char attack_board[ROW][COLUMN])
     return result;
 }
 
-// Função para atacar de forma interativa (mantida para compatibilidade)
-int attackInteractive(int target_board[ROW][COLUMN], char attack_board[ROW][COLUMN])
-{
-    return attackMenu(target_board, attack_board);
-}
 
-// Função para imprimir as posições de um navio
 
-void printShipPositions(int ship[][2], int ship_size, int ship_id)
-{
-    printf("Navio %d - Posições: ", ship_id);
-    for (int i = 0; i < ship_size; i++)
-    {
-        printf("[%d][%d]", ship[i][0], ship[i][1]);
-        if (i < ship_size - 1)
-            printf(", ");
-    }
-    printf("\n");
-}
 
-// Função para verificar se o navio foi atingido
 
-int isShipSunk(int board[ROW][COLUMN], int ship[][2], int ship_size, int ship_id)
-{
-    for (int i = 0; i < ship_size; i++)
-    {
-        if (board[ship[i][0]][ship[i][1]] != ship_id)
-            return 0;
-    }
-    return 1;
-}
 
-// Função para verificar se o jogo acabou
-
-int isGameOver(int board[ROW][COLUMN])
-{
-    for (int i = 0; i < ROW; i++)
-    {
-        for (int j = 0; j < COLUMN; j++)
-        {
-            if (board[i][j] == 0)
-                return 0;
-        }
-    }
-    return 1;
-}
 
 // Função para posicionar navio de forma interativa (elimina repetição de código)
 
