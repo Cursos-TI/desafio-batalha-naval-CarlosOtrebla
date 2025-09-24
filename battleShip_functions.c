@@ -15,40 +15,363 @@ int submarine[3];
 int cruiser[3];
 int destroyer[2];
 
-//~~~~~~~~~~~~~~~~~~~Funções de ataque ~~~~~~~~~~~~~~~~~~~~~~~~
+// =================== FUNÇÕES DE ATAQUES ESPECIAIS ===================
 
-// Ataque em cone
-void ataque_cone(int matriz[10][10], int alvo[2])
+// Função auxiliar para limpar buffer de entrada
+void clearInputBuffer()
 {
-    int linha_alvo = alvo[0];
-    int coluna_alvo = alvo[1];
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF)
+        ;
+}
 
-    // Verificar se o alvo está dentro dos limites da matriz
-    if (linha_alvo < 0 || linha_alvo >= 10 || coluna_alvo < 0 || coluna_alvo >= 10)
+// Função para converter entrada no formato "5B" para linha e coluna
+int parsePosition(char *input, int *row, int *column)
+{
+    // Verifica se o input tem pelo menos 2 caracteres
+    if (strlen(input) < 2)
     {
-        printf("ERRO: Coordenada alvo fora dos limites da matriz!\n");
-        return;
+        printf("❌ Formato inválido! Use o formato: LinhaColuna (ex: 5B)\n");
+        return 0;
     }
 
-    printf("=== ATAQUE EM CONE REALIZADO ===\n");
-    printf("Alvo: linha %d, coluna %d\n\n", linha_alvo, coluna_alvo);
-
-    // Percorrer toda a matriz com condição matemática para formar o cone
-    for (int i = 0; i < 10; i++)
+    // Converte para maiúscula para facilitar o processamento
+    for (int i = 0; input[i]; i++)
     {
-        for (int j = 0; j < 10; j++)
-        {
-            // Condição para formar o triângulo/cone:
-            // - Deve estar na linha do alvo ou até 2 linhas abaixo
-            // - A distância horizontal deve ser <= distância vertical do alvo
-            // - Fórmula: abs(j - coluna_alvo) <= (i - linha_alvo)
+        input[i] = toupper(input[i]);
+    }
 
-            if (i >= linha_alvo && i <= linha_alvo + 2 && abs(j - coluna_alvo) <= (i - linha_alvo))
+    // Extrai a linha (pode ser 1 ou 2 dígitos)
+    int line_num = 0;
+    int i = 0;
+
+    // Lê todos os dígitos do início
+    while (input[i] >= '0' && input[i] <= '9')
+    {
+        line_num = line_num * 10 + (input[i] - '0');
+        i++;
+    }
+
+    // Verifica se encontrou pelo menos um dígito
+    if (i == 0)
+    {
+        printf("❌ Formato inválido! Deve começar com um número (ex: 5B)\n");
+        return 0;
+    }
+
+    // Verifica se a linha está no intervalo válido
+    if (line_num < 1 || line_num > ROW)
+    {
+        printf("❌ Linha inválida! Use números de 1 a %d\n", ROW);
+        return 0;
+    }
+
+    // Verifica se há uma letra para a coluna
+    if (input[i] == '\0')
+    {
+        printf("❌ Formato inválido! Falta a letra da coluna (ex: 5B)\n");
+        return 0;
+    }
+
+    // Extrai a coluna
+    char col_char = input[i];
+
+    // Verifica se é uma letra válida
+    if (col_char < 'A' || col_char > 'J')
+    {
+        printf("❌ Coluna inválida! Use letras de A a J\n");
+        return 0;
+    }
+
+    // Verifica se há caracteres extras
+    if (input[i + 1] != '\0')
+    {
+        printf("❌ Formato inválido! Use apenas LinhaColuna (ex: 5B)\n");
+        return 0;
+    }
+
+    // Converte para índices 0-based
+    *row = line_num - 1;
+    *column = col_char - 'A';
+
+    return 1; // Sucesso
+}
+
+// Ataque em CONE - ataca em formato triangular para baixo
+int performConeAttack(int target_board[ROW][COLUMN], char attack_board[ROW][COLUMN], int row, int column)
+{
+    printf("\n🎆 === ATAQUE EM CONE ===\n");
+    printf("🎯 Atacando posição %c%d com padrão em cone!\n\n", nameColumn[column], row + 1);
+
+    int hits = 0;
+    int attacks = 0;
+
+    // Percorre as 3 linhas do cone (linha atual + 2 abaixo)
+    for (int i = 0; i < 3; i++)
+    {
+        int current_row = row + i;
+
+        // Para cada linha do cone, ataca posições baseado na distância
+        for (int j = -i; j <= i; j++)
+        {
+            int current_col = column + j;
+
+            // Verifica se a posição é válida
+            if (positionIsValid(current_row, current_col, ROW))
             {
-                matriz[i][j] = 3;
+                // Verifica se já foi atacada
+                if (attack_board[current_row][current_col] == UNKNOWN)
+                {
+                    attacks++;
+
+                    // Realiza o ataque
+                    if (target_board[current_row][current_col] != 0) // Há navio
+                    {
+                        attack_board[current_row][current_col] = HIT;
+                        target_board[current_row][current_col] = -target_board[current_row][current_col];
+                        hits++;
+                        printf("✅ ACERTO em %c%d!\n", nameColumn[current_col], current_row + 1);
+                    }
+                    else // Água
+                    {
+                        attack_board[current_row][current_col] = MISS;
+                        printf("💧 Água em %c%d\n", nameColumn[current_col], current_row + 1);
+                    }
+                }
+                else
+                {
+                    printf("⚠️ Posição %c%d já foi atacada\n", nameColumn[current_col], current_row + 1);
+                }
             }
         }
     }
+
+    printf("\n📊 RESULTADO DO ATAQUE EM CONE:\n");
+    printf("Ataques realizados: %d\n", attacks);
+    printf("Acertos: %d\n", hits);
+    printf("Taxa de acerto: %.1f%%\n", attacks > 0 ? (hits * 100.0) / attacks : 0.0);
+
+    return hits;
+}
+
+// Ataque em OCTAEDRO - formato losango (baseado no README)
+int performOctahedronAttack(int target_board[ROW][COLUMN], char attack_board[ROW][COLUMN], int row, int column)
+{
+    printf("\n🔶 === ATAQUE EM OCTAEDRO ===\n");
+    printf("🎯 Atacando posição %c%d com padrão octaedro (losango)!\n\n", nameColumn[column], row + 1);
+
+    int hits = 0;
+    int attacks = 0;
+
+    // Padrão octaedro baseado no README:
+    // 0 0 1 0 0
+    // 0 1 1 1 0
+    // 0 0 1 0 0
+
+    // Direções: cima, baixo, esquerda, direita, centro
+    int directions[5][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {0, 0}};
+    char *dir_names[] = {"cima", "baixo", "esquerda", "direita", "centro"};
+
+    for (int i = 0; i < 5; i++)
+    {
+        int current_row = row + directions[i][0];
+        int current_col = column + directions[i][1];
+
+        // Verifica se a posição é válida
+        if (positionIsValid(current_row, current_col, ROW))
+        {
+            // Verifica se já foi atacada
+            if (attack_board[current_row][current_col] == UNKNOWN)
+            {
+                attacks++;
+
+                // Realiza o ataque
+                if (target_board[current_row][current_col] != 0) // Há navio
+                {
+                    attack_board[current_row][current_col] = HIT;
+                    target_board[current_row][current_col] = -target_board[current_row][current_col];
+                    hits++;
+                    printf("✅ ACERTO em %c%d (%s)!\n", nameColumn[current_col], current_row + 1, dir_names[i]);
+                }
+                else // Água
+                {
+                    attack_board[current_row][current_col] = MISS;
+                    printf("💧 Água em %c%d (%s)\n", nameColumn[current_col], current_row + 1, dir_names[i]);
+                }
+            }
+            else
+            {
+                printf("⚠️ Posição %c%d (%s) já foi atacada\n", nameColumn[current_col], current_row + 1, dir_names[i]);
+            }
+        }
+        else
+        {
+            printf("🚫 Posição fora do tabuleiro (%s)\n", dir_names[i]);
+        }
+    }
+
+    printf("\n📊 RESULTADO DO ATAQUE EM OCTAEDRO:\n");
+    printf("Ataques realizados: %d\n", attacks);
+    printf("Acertos: %d\n", hits);
+    printf("Taxa de acerto: %.1f%%\n", attacks > 0 ? (hits * 100.0) / attacks : 0.0);
+
+    return hits;
+}
+
+// Ataque em CRUZ
+int performCrossAttack(int target_board[ROW][COLUMN], char attack_board[ROW][COLUMN], int row, int column)
+{
+    printf("\n=== ATAQUE EM CRUZ ===\n");
+    printf("🎯 Atacando posição %c%d com padrão em cruz estendida!\n\n", nameColumn[column], row + 1);
+
+    int hits = 0;
+    int attacks = 0;
+
+    // Padrão cruz baseado no README:
+    // 0 0 1 0 0
+    // 1 1 1 1 1
+    // 0 0 1 0 0
+
+    // Linha superior (só o centro)
+    if (positionIsValid(row - 1, column, ROW))
+    {
+        if (attack_board[row - 1][column] == UNKNOWN)
+        {
+            attacks++;
+            if (target_board[row - 1][column] != 0)
+            {
+                attack_board[row - 1][column] = HIT;
+                target_board[row - 1][column] = -target_board[row - 1][column];
+                hits++;
+                printf("✅ ACERTO em %c%d (cima)!\n", nameColumn[column], row);
+            }
+            else
+            {
+                attack_board[row - 1][column] = MISS;
+                printf("Água em %c%d (cima)\n", nameColumn[column], row);
+            }
+        }
+        else
+        {
+            printf("Posição %c%d (cima) já foi atacada\n", nameColumn[column], row);
+        }
+    }
+
+    // Linha central (5 posições: 2 à esquerda, centro, 2 à direita)
+    for (int j = -2; j <= 2; j++)
+    {
+        int current_col = column + j;
+        if (positionIsValid(row, current_col, ROW))
+        {
+            if (attack_board[row][current_col] == UNKNOWN)
+            {
+                attacks++;
+                if (target_board[row][current_col] != 0)
+                {
+                    attack_board[row][current_col] = HIT;
+                    target_board[row][current_col] = -target_board[row][current_col];
+                    hits++;
+                    printf("✅ ACERTO em %c%d (centro)!\n", nameColumn[current_col], row + 1);
+                }
+                else
+                {
+                    attack_board[row][current_col] = MISS;
+                    printf("Água em %c%d (centro)\n", nameColumn[current_col], row + 1);
+                }
+            }
+            else
+            {
+                printf("Posição %c%d (centro) já foi atacada\n", nameColumn[current_col], row + 1);
+            }
+        }
+    }
+
+    // Linha inferior (só o centro)
+    if (positionIsValid(row + 1, column, ROW))
+    {
+        if (attack_board[row + 1][column] == UNKNOWN)
+        {
+            attacks++;
+            if (target_board[row + 1][column] != 0)
+            {
+                attack_board[row + 1][column] = HIT;
+                target_board[row + 1][column] = -target_board[row + 1][column];
+                hits++;
+                printf("✅ ACERTO em %c%d (baixo)!\n", nameColumn[column], row + 2);
+            }
+            else
+            {
+                attack_board[row + 1][column] = MISS;
+                printf("Água em %c%d (baixo)\n", nameColumn[column], row + 2);
+            }
+        }
+        else
+        {
+            printf("Posição %c%d (baixo) já foi atacada\n", nameColumn[column], row + 2);
+        }
+    }
+
+    printf("\nRESULTADO DO ATAQUE EM CRUZ:\n");
+    printf("Ataques realizados: %d\n", attacks);
+    printf("Acertos: %d\n", hits);
+    printf("Taxa de acerto: %.1f%%\n", attacks > 0 ? (hits * 100.0) / attacks : 0.0);
+
+    return hits;
+}
+
+// Ataque em CÍRCULO - ataca todas as posições ao redor em um raio de 1
+int performCircleAttack(int target_board[ROW][COLUMN], char attack_board[ROW][COLUMN], int row, int column)
+{
+    printf("\n === ATAQUE EM CÍRCULO ===\n");
+    printf(" Atacando posição %c%d com padrão circular!\n\n", nameColumn[column], row + 1);
+
+    int hits = 0;
+    int attacks = 0;
+
+    // Percorre um quadrado 3x3 centrado na posição alvo
+    for (int i = -1; i <= 1; i++)
+    {
+        for (int j = -1; j <= 1; j++)
+        {
+            int current_row = row + i;
+            int current_col = column + j;
+
+            // Verifica se a posição é válida
+            if (positionIsValid(current_row, current_col, ROW))
+            {
+                // Verifica se já foi atacada
+                if (attack_board[current_row][current_col] == UNKNOWN)
+                {
+                    attacks++;
+
+                    // Realiza o ataque
+                    if (target_board[current_row][current_col] != 0) // Há navio
+                    {
+                        attack_board[current_row][current_col] = HIT;
+                        target_board[current_row][current_col] = -target_board[current_row][current_col];
+                        hits++;
+                        printf("✅ ACERTO em %c%d!\n", nameColumn[current_col], current_row + 1);
+                    }
+                    else // Água
+                    {
+                        attack_board[current_row][current_col] = MISS;
+                        printf("💧 Água em %c%d\n", nameColumn[current_col], current_row + 1);
+                    }
+                }
+                else
+                {
+                    printf("⚠️ Posição %c%d já foi atacada\n", nameColumn[current_col], current_row + 1);
+                }
+            }
+        }
+    }
+
+    printf("\nRESULTADO DO ATAQUE CIRCULAR:\n");
+    printf("Ataques realizados: %d\n", attacks);
+    printf("Acertos: %d\n", hits);
+    printf("Taxa de acerto: %.1f%%\n", attacks > 0 ? (hits * 100.0) / attacks : 0.0);
+
+    return hits;
 }
 
 // ~~~~~~~~~~~~~~~~~~~~Funções de diversas~~~~~~~~~~~~~~~~~~~~~
@@ -135,8 +458,8 @@ int positionShipInteractiveNew(int board[ROW][COLUMN], int ship_type,
         {
             printf("Erro: Você já posicionou todos os destroyers!\n");
             printf("Pressione Enter para escolher outro navio...");
-            getchar(); // Limpa buffer
-            getchar(); // Espera Enter
+            clearInputBuffer();
+            getchar();
             return 0;
         }
         ship_size = 2;
@@ -148,8 +471,8 @@ int positionShipInteractiveNew(int board[ROW][COLUMN], int ship_type,
         {
             printf("Erro: Você já posicionou todos os cruzadores!\n");
             printf("Pressione Enter para escolher outro navio...");
-            getchar(); // Limpa buffer
-            getchar(); // Espera Enter
+            clearInputBuffer();
+            getchar();
             return 0;
         }
         ship_size = 3;
@@ -161,8 +484,8 @@ int positionShipInteractiveNew(int board[ROW][COLUMN], int ship_type,
         {
             printf("Erro: Você já posicionou o navio de guerra!\n");
             printf("Pressione Enter para escolher outro navio...");
-            getchar(); // Limpa buffer
-            getchar(); // Espera Enter
+            clearInputBuffer();
+            getchar();
             return 0;
         }
         ship_size = 4;
@@ -174,8 +497,8 @@ int positionShipInteractiveNew(int board[ROW][COLUMN], int ship_type,
         {
             printf("Erro: Você já posicionou o porta-aviões!\n");
             printf("Pressione Enter para escolher outro navio...");
-            getchar(); // Limpa buffer
-            getchar(); // Espera Enter
+            clearInputBuffer();
+            getchar();
             return 0;
         }
         ship_size = 5;
@@ -188,13 +511,16 @@ int positionShipInteractiveNew(int board[ROW][COLUMN], int ship_type,
     }
 
     // Agora escolhe a orientação
-    printf(" Escolha a orientação para o navio:\n\n");
-    printf(" 1 - Vertical (para baixo)\n");
-    printf(" 2 - Horizontal (para direita)\n");
-    printf(" 3 - Diagonal crescente\n");
-    printf(" 4 - Diagonal decrescente\n");
-    printf(" 0 - Cancelar\n");
-    scanf("%d", &orientation);
+    printf("╔═ Escolha a orientação para o navio:\n");
+    printf("║\n");
+    printf("╠═ 1 - Vertical (para baixo)\n");
+    printf("╠═ 2 - Horizontal (para direita)\n");
+    printf("╠═ 3 - Diagonal crescente\n");
+    printf("╠═ 4 - Diagonal decrescente\n");
+    printf("╠═ 0 - Cancelar\n");
+    printf("║\n");
+    printf("╚════► ");
+    orientation = getValidInteger("", 0, 4); // Usa função robusta
 
     if (orientation == 0)
     {
@@ -209,27 +535,19 @@ int positionShipInteractiveNew(int board[ROW][COLUMN], int ship_type,
     printBoard(board);
     // Solicita as coordenadas iniciais
     const char *orientations[] = {"vertical", "horizontal", "diagonal crescente", "diagonal decrescente"};
-    printf("\nO navio será posicionado na orientação %s.\n", orientations[orientation - 1]);
-    printf("Digite as coordenadas iniciais do navio (tamanho %d):\n", ship_size);
-    printf("Linha (1-%d): ", ROW);
-    scanf("%d", &row);
+    printf("\n╔═ O navio será posicionado na orientação %s.\n", orientations[orientation - 1]);
+    printf("║  Digite a posição inicial do navio (tamanho %d). (ex: 5B, 10A, 3F):\n", ship_size);
+    printf("║\n");
+    printf("╚════► ");
+    fflush(stdout); // ADICIONADO: Cursor pisca esperando entrada de coordenadas
 
-    if (row < 1 || row > ROW)
+    char position[10];
+    scanf("%s", position);
+
+    // Converte a entrada para linha e coluna
+    if (!parsePosition(position, &row, &column))
     {
-        printf("Erro: Linha inválida! Use números de 1 a %d.\n", ROW);
-        return 0;
-    }
-
-    row--; // Converte para índice 0-based
-    printf("Coluna (A-J ou a-j): ");
-    char col_char;
-    scanf(" %c", &col_char);
-    col_char = toupper(col_char);
-    column = col_char - 'A';
-
-    if (column < 0 || column >= COLUMN)
-    {
-        printf("Erro: Coluna inválida! Use letras de A a J.\n");
+        printf("\n💬 Dica: Digite linha seguida da coluna, como 5B, 10A, etc.\n");
         return 0;
     }
 
@@ -260,7 +578,7 @@ int positionShipInteractiveNew(int board[ROW][COLUMN], int ship_type,
     }
 
     // Tenta posicionar o navio
-    printf("\n🎯 Tentando posicionar navio na posição %c%d...\n", col_char, row + 1);
+    printf("\n🎯 Tentando posicionar navio na posição %c%d...\n", nameColumn[column], row + 1);
     if (placeShip(board, ship_temp, ship_size, ship_id))
     {
         printf("✅ Navio posicionado com sucesso!\n");
@@ -284,7 +602,7 @@ int positionShipInteractiveNew(int board[ROW][COLUMN], int ship_type,
 
         printBoard(board);
         printf("Pressione Enter para continuar...");
-        getchar();
+        clearInputBuffer();
         getchar();
         return 1; // Sucesso
     }
@@ -293,7 +611,7 @@ int positionShipInteractiveNew(int board[ROW][COLUMN], int ship_type,
         printf("❌ Não foi possível posicionar o navio nesta posição!\n");
         printf("Verifique se há espaço suficiente e se não há sobreposição.\n");
         printf("Pressione Enter para tentar novamente...");
-        getchar();
+        clearInputBuffer();
         getchar();
         return 0; // Falha
     }
@@ -312,6 +630,38 @@ void enableColors()
     dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
     SetConsoleMode(hOut, dwMode);
 #endif
+}
+
+// Função para obter entrada válida de número inteiro
+int getValidInteger(const char *prompt, int min, int max)
+{
+    int value;
+    int result;
+
+    do
+    {
+        printf("%s", prompt);
+        // fflush(stdout); // ADICIONADO: Força exibição imediata do prompt para o cursor piscar
+        result = scanf("%d", &value);
+
+        if (result != 1)
+        {
+            // Não conseguiu ler um número
+            printf("║    ❌ Opção inválida: Digite apenas números!\n");
+            printf("╚════► ");
+            clearInputBuffer();
+            continue;
+        }
+
+        if (value < min || value > max)
+        {
+            printf("❌ Opção inválida: Digite um número entre %d e %d!\n", min, max);
+            continue;
+        }
+
+        return value;
+
+    } while (1);
 }
 
 // Função para inicializar o tabuleiro de ataques
@@ -403,8 +753,8 @@ void printAttackBoard(char attack_board[ROW][COLUMN])
         printf("\n");
     }
 
-    printf("\nLegenda: " BLUE "~ = Não atacado" RESET_COLOR " | " BRIGHT_GREEN "X = Acerto" RESET_COLOR " | " WHITE "O = Água" RESET_COLOR "\n");
-    printf("\n");
+    printf("\nLegenda: " BLUE "~ = Não atacado" RESET_COLOR " | " BRIGHT_GREEN "X = Acerto" RESET_COLOR " | " WHITE "O = Água" RESET_COLOR "\n\n");
+    // printf("\n");
 }
 
 // Função para imprimir o tabuleiro
@@ -556,49 +906,90 @@ void printBothBoards(int ship_board[ROW][COLUMN], char attack_board[ROW][COLUMN]
     printf("Ataques: " BLUE "~ = Não atacado" RESET_COLOR " | " BRIGHT_GREEN "X = Acerto" RESET_COLOR " | " WHITE "O = Água" RESET_COLOR "\n\n");
 }
 
-// Função para atacar de forma interativa
-int attackInteractive(int target_board[ROW][COLUMN], char attack_board[ROW][COLUMN])
+// Menu de tipos de ataque
+int attackMenu(int target_board[ROW][COLUMN], char attack_board[ROW][COLUMN])
 {
+    int attack_type;
     int row, column;
-    char col_char;
+    char position[10]; // Buffer para entrada no formato "5B"
+    int result = 0;
 
-    printf("\n=== REALIZAR ATAQUE ===\n");
+    printf("\n🚀 === MENU DE ATAQUES ===\n\n");
     printAttackBoard(attack_board);
 
-    printf("Digite as coordenadas do ataque:\n");
-    printf("Linha (1-%d): ", ROW);
-    scanf("%d", &row);
+    printf("╔═ Escolha o tipo de ataque:\n");
+    printf("║\n");
+    printf("╠═ 1 - Ataque Simples --- (1 posição)\n");
+    printf("╠═ 2 - Ataque em Cone --- (triângulo para baixo)\n");
+    printf("╠═ 3 - Ataque Octaedro -- (losango - 5 posições)\n");
+    printf("╠═ 4 - Ataque em Cruz --- (cruz estendida - 7 posições)\n");
+    printf("╠═ 5 - Ataque Circular -- (3x3 ao redor)\n");
+    printf("╠═ 0 - Voltar ao menu principal\n");
+    printf("║\n");
+    printf("╚════► ");
+    fflush(stdout); // ADICIONADO: Cursor pisca no menu de ataques
+    scanf("%d", &attack_type);
 
-    // Verifica se a linha é válida
-    if (row < 1 || row > ROW)
+    if (attack_type == 0)
     {
-        printf("Erro: Linha inválida! Use números de 1 a %d.\n", ROW);
+        return 0; // Voltar ao menu principal
+    }
+
+    if (attack_type < 1 || attack_type > 5)
+    {
+        printf("\n❌ Tipo de ataque inválido!\n");
         return -1;
     }
 
-    row--; // Converte para índice 0-based
+    // Solicitar coordenadas para o ataque no novo formato
+    printf("\n╔═ Digite a posição do ataque (ex: 5B, 10A, 3F):\n");
+    printf("╚════► ");
+    fflush(stdout); // ADICIONADO: Cursor pisca esperando coordenadas de ataque
+    scanf("%s", position);
 
-    printf("Coluna (A-J ou a-j): ");
-    scanf(" %c", &col_char);
-    col_char = toupper(col_char);
-    column = col_char - 'A';
-
-    // Verifica se a coluna é válida
-    if (column < 0 || column >= COLUMN)
+    // Converte a entrada para linha e coluna
+    if (!parsePosition(position, &row, &column))
     {
-        printf("Erro: Coluna inválida! Use letras de A a J.\n");
+        printf("\n💬 Dica: Digite linha seguida da coluna, como 5B, 10A, etc.\n");
         return -1;
     }
 
-    printf("\n🎯 Atacando posição %c%d...\n", col_char, row + 1);
+    // Executa o tipo de ataque escolhido
+    switch (attack_type)
+    {
+    case 1: // Ataque simples
+        printf("\n🎯 Atacando posição %c%d...\n", nameColumn[column], row + 1);
+        result = performAttack(target_board, attack_board, row, column);
+        break;
 
-    // Realiza o ataque
-    int result = performAttack(target_board, attack_board, row, column);
+    case 2: // Ataque em cone
+        result = performConeAttack(target_board, attack_board, row, column);
+        break;
 
-    // Mostra o resultado atualizado
+    case 3: // Ataque octaedro
+        result = performOctahedronAttack(target_board, attack_board, row, column);
+        break;
+
+    case 4: // Ataque em cruz
+        result = performCrossAttack(target_board, attack_board, row, column);
+        break;
+
+    case 5: // Ataque circular
+        result = performCircleAttack(target_board, attack_board, row, column);
+        break;
+    }
+
+    // Mostra o tabuleiro atualizado
+    printf("\n");
     printAttackBoard(attack_board);
 
     return result;
+}
+
+// Função para atacar de forma interativa (mantida para compatibilidade)
+int attackInteractive(int target_board[ROW][COLUMN], char attack_board[ROW][COLUMN])
+{
+    return attackMenu(target_board, attack_board);
 }
 
 // Função para imprimir as posições de um navio
@@ -657,12 +1048,15 @@ int positionShipInteractive(int board[ROW][COLUMN], int orientation,
         ship_size = 0; // Reset para controlar o loop
 
         printBoard(board);
-        printf("Qual navio deseja posicionar?\n");
-        printf("1 - Destroyer - Navio de 2 casas (restam: %d)\n", 2 - *positioned_destroyer);
-        printf("2 - Cruzador - Navio de 3 casas (restam: %d)\n", 2 - *positioned_cruiser);
-        printf("3 - Navio de guerra - Navio de 4 casas (restam: %d)\n", 1 - *positioned_battleship);
-        printf("4 - Porta-avioes - Navio de 5 casas (restam: %d)\n", 1 - *positioned_aircraft_carrier);
-        printf("0 - Voltar ao menu de orientações\n");
+        printf("╔═Qual navio deseja posicionar?\n");
+        printf("║\n");
+        printf("╠═ 1 - Destroyer --------- Navio de 2 casas (restam: %d)\n", 2 - *positioned_destroyer);
+        printf("╠═ 2 - Cruzador ---------- Navio de 3 casas (restam: %d)\n", 2 - *positioned_cruiser);
+        printf("╠═ 3 - Navio de guerra --- Navio de 4 casas (restam: %d)\n", 1 - *positioned_battleship);
+        printf("╠═ 4 - Porta-avioes ------ Navio de 5 casas (restam: %d)\n", 1 - *positioned_aircraft_carrier);
+        printf("╠═ 0 - Menu anterior\n");
+        printf("║\n");
+        printf("╚════► ");
         scanf("%d", &ship_type);
 
         // Permite cancelar e voltar ao menu anterior
@@ -734,16 +1128,11 @@ int positionShipInteractive(int board[ROW][COLUMN], int orientation,
 
     // Solicita as coordenadas iniciais
     const char *orientations[] = {"vertical", "horizontal", "diagonal crescente", "diagonal decrescente"};
-    printf("O navio será posicionado na orientação %s.\n", orientations[orientation - 1]);
-    printf("Digite as coordenadas iniciais do navio (tamanho %d):\n", ship_size);
-    printf("Linha (1-%d): ", ROW);
-    scanf("%d", &row);
-
-    if (row < 1 || row > ROW)
-    {
-        printf("Erro: Linha inválida! Use números de 1 a %d.\n", ROW);
-        return 0;
-    }
+    printf("╔═ O navio será posicionado na orientação %s.\n", orientations[orientation - 1]);
+    printf("║  Digite as coordenadas iniciais do navio (tamanho %d):\n", ship_size);
+    printf("║\n");
+    printf("╚════► ");
+    row = getValidInteger("Linha (1-10): ", 1, ROW); // Usa função robusta
 
     row--; // Converte para índice 0-based
     printf("Coluna (A-J ou a-j): ");

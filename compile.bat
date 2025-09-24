@@ -1,25 +1,25 @@
 @echo off
 echo =====================================
-echo    COMPILANDO BATALHA NAVAL
+echo       COMPILANDO BATALHA NAVAL
 echo =====================================
 echo.
 
-REM Limpar execut·veis anteriores
+REM Limpar executaveis anteriores
 del /q *.exe 2>nul
 
-echo Compilando e criando execut·vel...
+echo Compilando e criando executavel...
 gcc -Wall -Wextra -std=c99 battleShip_main.c battleShip_functions.c -o batalha_naval.exe
 if errorlevel 1 (
-    echo ERRO: Falha na compilacao
+    echo ERRO: Falha na compila√ß√£o
     pause
     exit /b
 )
 
 echo.
 echo =====================================
-echo    COMPILA«√O CONCLUÕDA!
+echo       COMPILACAO CONCLUIDA!
 echo =====================================
-echo Execut·vel criado: batalha_naval.exe
+echo Executavel criado: batalha_naval.exe
 echo.
 
 if "%1"=="run" (
@@ -29,4 +29,3 @@ if "%1"=="run" (
 )
 
 pause
-

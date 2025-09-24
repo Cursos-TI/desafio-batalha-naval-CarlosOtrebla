@@ -6,6 +6,8 @@
 #include <string.h>
 #include <windows.h>
 #include <ctype.h>
+#include <stdlib.h> // Para abs()
+#include <math.h>   // Para funções matemáticas
 
 // Definindo o tamanho do tabuleiro
 #define ROW 10
@@ -58,12 +60,25 @@ int positionShipInteractiveNew(int board[ROW][COLUMN], int ship_type,
 // Funções de ataque
 void initializeAttackBoard(char attack_board[ROW][COLUMN]);
 void enableColors(); // Função para habilitar cores no Windows
+int getValidInteger(const char* prompt, int min, int max); // Função para entrada válida
+void clearInputBuffer(); // Função para limpar buffer
 int performAttack(int target_board[ROW][COLUMN], char attack_board[ROW][COLUMN], int row, int column);
 void printAttackBoard(char attack_board[ROW][COLUMN]);
 void printBothBoards(int ship_board[ROW][COLUMN], char attack_board[ROW][COLUMN]);
 int attackInteractive(int target_board[ROW][COLUMN], char attack_board[ROW][COLUMN]);
+int attackMenu(int target_board[ROW][COLUMN], char attack_board[ROW][COLUMN]); // Menu de ataques especiais
 
-// Função de ataque em cone
-int performConeAttack(int target_board[ROW][COLUMN], char attack_board[ROW][COLUMN], int alvo[2]);
+// Funções de ataques especiais
+int performConeAttack(int target_board[ROW][COLUMN], char attack_board[ROW][COLUMN], int row, int column);
+int performOctahedronAttack(int target_board[ROW][COLUMN], char attack_board[ROW][COLUMN], int row, int column);
+int performCrossAttack(int target_board[ROW][COLUMN], char attack_board[ROW][COLUMN], int row, int column);
+int performCircleAttack(int target_board[ROW][COLUMN], char attack_board[ROW][COLUMN], int row, int column);
+int attackMenu(int target_board[ROW][COLUMN], char attack_board[ROW][COLUMN]);
+
+// Função auxiliar para limpar buffer de entrada
+void clearInputBuffer();
+
+// Função para converter entrada no formato "5B" para linha e coluna
+int parsePosition(char* input, int* row, int* column);
 
 #endif // BATTLESHIP_H

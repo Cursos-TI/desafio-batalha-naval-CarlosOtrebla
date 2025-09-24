@@ -29,22 +29,27 @@ int main()
 
         // Calcula quantos navios foram posicionados
         int total_ships = positioned_destroyer + positioned_cruiser + positioned_battleship + positioned_aircraft_carrier;
-        int max_ships = 2 + 2 + 1 + 1;
+        int max_ships = 6;
 
-        printf(" Escolha uma opção:\n\n");
+        printf("╔═  Escolha uma opção:\n");
+        printf("║\n");
         if (total_ships >= max_ships)
         {
-            printf("1 - Posicionar navios (✓ COMPLETO)\n");
+            printf("╠═ 1 - Posicionar navios (✓ COMPLETO)\n");
         }
         else
         {
-            printf("1 - Posicionar navios (%d/%d navios)\n", total_ships, max_ships);
+            printf("╠═ 1 - Posicionar navios (%d/%d navios)\n", total_ships, max_ships);
         }
-        printf("2 - Ver status dos navios\n");
-        printf("3 - Atacar (modo teste)\n");
-        printf("4 - Ver ambos os tabuleiros\n");
-        printf("0 - Sair\n");
-        scanf("%d", &option);
+        printf("╠═ 2 - Ver status dos navios\n");
+        printf("╠═ 3 - Ataques especiais (modo teste)\n");
+        printf("╠═ 4 - Ver ambos os tabuleiros\n");
+        printf("╠═ 0 - Sair\n");
+        printf("║\n");
+        printf("╚════► ");
+        
+
+        option = getValidInteger("", 0, 4);
 
         switch (option)
         {
@@ -52,7 +57,7 @@ int main()
         {
             // Verifica se todos os navios já foram posicionados
             int total_ships = positioned_destroyer + positioned_cruiser + positioned_battleship + positioned_aircraft_carrier;
-            int max_ships = 2 + 2 + 1 + 1; // 2 destroyers + 2 cruzadores + 1 battleship + 1 aircraft carrier
+            int max_ships = 6;
 
             if (total_ships >= max_ships)
             {
@@ -67,7 +72,7 @@ int main()
                 printf("- Fazer ataques de teste (opção 3)\n");
                 printf("- Ver ambos os tabuleiros (opção 4)\n");
                 printf("\nPressione Enter para continuar...");
-                getchar();
+                clearInputBuffer();
                 getchar();
                 break;
             }
@@ -81,52 +86,55 @@ int main()
                     printf("\n🎉 PARABÉNS! TODOS OS NAVIOS FORAM POSICIONADOS!\n");
                     printf("Retornando ao menu principal...\n");
                     printf("\nPressione Enter para continuar...");
+                    clearInputBuffer();
                     getchar();
-                    getchar();
-                    break; // Sai do loop e volta ao menu principal
+                    break;
                 }
 
                 printBoard(board);
-                printf(" Qual navio deseja posicionar?\n\n");
+                printf("╔═ Qual navio deseja posicionar?\n");
+                printf("║\n");
                 if (positioned_destroyer < 2)
                 {
-                    printf(" 1 - Destroyer --------- Navio de 2 casas (restam: %d)\n", 2 - positioned_destroyer);
+                    printf("╠═ 1 - Destroyer --------- Navio de 2 casas (restam: %d)\n", 2 - positioned_destroyer);
                 }
                 else
                 {
-                    printf(" 1 - Destroyer (✓)\n");
+                    printf(" ╠═ 1 - Destroyer (✓)\n");
                 }
                 if (positioned_cruiser < 2)
                 {
-                    printf(" 2 - Cruzador  --------- Navio de 3 casas (restam: %d)\n", 2 - positioned_cruiser);
+                    printf("╠═ 2 - Cruzador  --------- Navio de 3 casas (restam: %d)\n", 2 - positioned_cruiser);
                 }
                 else
                 {
-                    printf(" 2 - Cruzador (✓)\n");
+                    printf("╠═ 2 - Cruzador (✓)\n");
                 }
                 if (positioned_battleship < 1)
                 {
-                    printf(" 3 - Navio de guerra --- Navio de 4 casas (restam: %d)\n", 1 - positioned_battleship);
+                    printf("╠═ 3 - Navio de guerra --- Navio de 4 casas (restam: %d)\n", 1 - positioned_battleship);
                 }
                 else
                 {
-                    printf(" 3 - Navio de guerra (✓)\n");
+                    printf("╠═ 3 - Navio de guerra (✓)\n");
                 }
                 if (positioned_aircraft_carrier < 1)
                 {
-                    printf(" 4 - Porta-avioes ------ Navio de 5 casas (restam: %d)\n", 1 - positioned_aircraft_carrier);
+                    printf("╠═ 4 - Porta-avioes ------ Navio de 5 casas (restam: %d)\n", 1 - positioned_aircraft_carrier);
                 }
                 else
                 {
-                    printf(" 4 - Porta-avioes (✓)\n");
+                    printf("╠═ 4 - Porta-avioes (✓)\n");
                 }
 
-                printf(" 0 - Menu Principal\n");
-                scanf("%d", &optionPosition);
+                printf("╠═ 0 - Menu Principal\n");
+                printf("║\n");
+                printf("╚════► ");
+                optionPosition = getValidInteger("", 0, 4); // Usa função robusta
 
-                if (optionPosition == 0)
+                if (optionPosition == 0 )
                 {
-                    break; // Volta ao menu principal
+                    break;
                 }
 
                 // Chama a função interativa que agora vai pedir a orientação
@@ -140,36 +148,38 @@ int main()
 
         case 3: // Atacar (modo teste)
         {
-            printf("\n=== MODO DE ATAQUE (TESTE) ===\n");
-            printf("Você pode atacar seus próprios navios para testar!\n");
+            printf("\n🚀 ====== MODO DE ATAQUE (TESTE) ======\n\n");
+            printf("🎯 Teste seus ataques especiais nos seus próprios navios!\n");
+            printf("💡 Experimente os diferentes tipos de ataque:\n");
+            printf("   • Ataque Simples: Precisão máxima\n");
+            printf("   • Ataque em Cone: Área triangular\n");
+            printf("   • Ataque em Cruz: 5 posições (+)\n");
+            printf("   • Ataque Circular: Área 3x3\n\n");
 
             int attack_result;
             do
             {
-                attack_result = attackInteractive(board, attack_board);
+                attack_result = attackMenu(board, attack_board);
 
                 if (attack_result == -1)
                 {
-                    printf("\nErro no ataque! Tente novamente.\n");
+                    printf("\n❌ Erro no ataque! Tente novamente.\n");
                     printf("Pressione Enter para continuar...");
-                    getchar();
+                    clearInputBuffer();
                     getchar();
                 }
                 else if (attack_result == 0)
                 {
-                    printf("\nPressione Enter para continuar...");
-                    getchar();
-                    getchar();
-                    break; // Água - volta ao menu
+                    break; // Voltar ao menu principal
                 }
-                else if (attack_result == 1)
+                else if (attack_result > 0)
                 {
-                    printf("\nAcertou! Deseja atacar novamente? (s/n): ");
+                    printf("\n🎉 Sucesso! Deseja fazer outro ataque? (s/n): ");
                     char continue_attack;
                     scanf(" %c", &continue_attack);
                     if (continue_attack != 's' && continue_attack != 'S')
                     {
-                        break; // Volta ao menu
+                        break;
                     }
                 }
             } while (attack_result != 0);
@@ -181,7 +191,7 @@ int main()
         {
             printBothBoards(board, attack_board);
             printf("Pressione Enter para continuar...");
-            getchar();
+            clearInputBuffer();
             getchar();
             break;
         }
@@ -190,7 +200,7 @@ int main()
         {
             printf("\n============== STATUS DOS NAVIOS ==============\n\n");
             printf("Destroyers -------- (2 casas):  %d/2 posicionados\n", positioned_destroyer);
-            printf("Cruzadores ---------(3 casas):  %d/2 posicionados\n", positioned_cruiser);
+            printf("Cruzadores -------- (3 casas):  %d/2 posicionados\n", positioned_cruiser);
             printf("Navio de guerra --- (4 casas):  %d/1 posicionado\n", positioned_battleship);
             printf("Porta-aviões ------ (5 casas):  %d/1 posicionado\n", positioned_aircraft_carrier);
             printf("\n================================================\n");
@@ -201,8 +211,8 @@ int main()
             printf("3 = Navio de guerra\n");
             printf("4 = Porta-aviões\n");
             printf("\nPressione Enter para continuar...");
-            getchar(); // Limpa o buffer
-            getchar(); // Espera Enter
+            clearInputBuffer();
+            getchar();
             break;
         }
 
