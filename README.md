@@ -1,21 +1,11 @@
-# Execução e compilação do programa pelo terminal.
+## 🛠️ Compilação
 
-## 1ª opção - Apenas compilar
+```bash
+# Compilar
+./compile.bat
 
-```bas
-compile.bat
-```
-
-## 2ª opção - Compilar e executar automaticamente:
-
-```bas
-compile.bat run
-```
-
-## 3ª opção - Jeito mais rápido( compilar + executar):
-
-```bas
-run.bat
+# Compilar e executar
+./compile.bat run
 ```
 
 # ⚠️ Importante

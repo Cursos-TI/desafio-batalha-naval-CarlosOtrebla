@@ -13,9 +13,9 @@ Este projeto agora conta com 5 tipos diferentes de ataque:
 - Formato triangular para baixo
 - Ataca 6 posições no total:
   ```
-      X     <- linha do alvo
-    X X X  <- linha +1
-  X X X X X <- linha +2
+      X       <- linha do alvo
+    X X X     <- linha +1
+  X X X X X   <- linha +2
   ```
 - Ótimo para áreas suspeitas
 
@@ -87,17 +87,16 @@ Posição: 5B
 - ✅ **Estatísticas em tempo real**: Taxa de acerto por ataque
 - ✅ **Interface colorida**: Fácil visualização dos resultados
 - ✅ **Feedback detalhado**: Informações sobre cada ataque realizado
-- ✅ **Correção do buffer**: Não mais duplo Enter necessário!
 - ✅ **Interface simplificada**: Digite apenas `5B` ao invés de linha e coluna separadas!
 
 ## 🛠️ Compilação
 
 ```bash
 # Compilar
-compile.bat
+./compile.bat
 
 # Compilar e executar
-compile.bat run
+./compile.bat run
 ```
 
 ## 🎮 Navios Disponíveis
@@ -113,7 +112,3 @@ compile.bat run
 - ✅ **Validação robusta**: Detecta formatos inválidos automaticamente
 - ✅ **Mensagens claras**: Feedback específico para cada tipo de erro
 - ✅ **Exemplos práticos**: Mostra como usar corretamente
-
----
-**Desenvolvido por CarlosOtrebla**
-*Versão com interface simplificada!* ⚡
