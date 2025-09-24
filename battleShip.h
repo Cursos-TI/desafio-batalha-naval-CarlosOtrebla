@@ -6,8 +6,7 @@
 #include <string.h>
 #include <windows.h>
 #include <ctype.h>
-#include <stdlib.h> // Para abs()
-#include <math.h>   // Para funções matemáticas
+#include <stdlib.h> // Para abs() nos ataques especiais
 
 // Definindo o tamanho do tabuleiro
 #define ROW 10
@@ -16,7 +15,6 @@
 // Definindo constantes para ataques
 #define HIT 'X'     // Acertou navio
 #define MISS 'O'    // Errou (água)
-#define SUNK 'S'    // Navio afundado
 #define UNKNOWN '~' // Posição não atacada
 
 // Definindo cores ANSI
@@ -35,50 +33,30 @@
 extern char nameColumn[];
 extern char attack_board[ROW][COLUMN]; // Tabuleiro de ataques
 
-// Definindo os tipos de navios
-extern int aircraftCarrier[5];
-extern int battleship[4];
-extern int cruiser[3];
-extern int destroyer[2];
-
-// Declaração das funções
+// FUNÇÕES PRINCIPAIS
 int positionIsValid(int row, int column, int board_size);
 int canPlaceShip(int board[ROW][COLUMN], int ship[][2], int ship_size);
-void clearBoard(int board[ROW][COLUMN]);
 void printBoard(int board[ROW][COLUMN]);
-int isShipSunk(int board[ROW][COLUMN], int ship[][2], int ship_size, int ship_id);
-int isGameOver(int board[ROW][COLUMN]);
-void printShipPositions(int ship[][2], int ship_size, int ship_id);
 int placeShip(int board[ROW][COLUMN], int ship[][2], int ship_size, int ship_id);
-int positionShipInteractive(int board[ROW][COLUMN], int orientation,
-                            int *positioned_destroyer, int *positioned_cruiser,
-                            int *positioned_battleship, int *positioned_aircraft_carrier);
 int positionShipInteractiveNew(int board[ROW][COLUMN], int ship_type,
                                int *positioned_destroyer, int *positioned_cruiser,
                                int *positioned_battleship, int *positioned_aircraft_carrier);
 
-// Funções de ataque
+// FUNÇÕES DE ATAQUE
 void initializeAttackBoard(char attack_board[ROW][COLUMN]);
-void enableColors(); // Função para habilitar cores no Windows
-int getValidInteger(const char* prompt, int min, int max); // Função para entrada válida
-void clearInputBuffer(); // Função para limpar buffer
+void enableColors();
+int getValidInteger(const char* prompt, int min, int max);
+void clearInputBuffer();
 int performAttack(int target_board[ROW][COLUMN], char attack_board[ROW][COLUMN], int row, int column);
 void printAttackBoard(char attack_board[ROW][COLUMN]);
 void printBothBoards(int ship_board[ROW][COLUMN], char attack_board[ROW][COLUMN]);
-int attackInteractive(int target_board[ROW][COLUMN], char attack_board[ROW][COLUMN]);
-int attackMenu(int target_board[ROW][COLUMN], char attack_board[ROW][COLUMN]); // Menu de ataques especiais
+int attackMenu(int target_board[ROW][COLUMN], char attack_board[ROW][COLUMN]);
 
-// Funções de ataques especiais
+// FUNÇÕES DE ATAQUES ESPECIAIS
 int performConeAttack(int target_board[ROW][COLUMN], char attack_board[ROW][COLUMN], int row, int column);
 int performOctahedronAttack(int target_board[ROW][COLUMN], char attack_board[ROW][COLUMN], int row, int column);
 int performCrossAttack(int target_board[ROW][COLUMN], char attack_board[ROW][COLUMN], int row, int column);
 int performCircleAttack(int target_board[ROW][COLUMN], char attack_board[ROW][COLUMN], int row, int column);
-int attackMenu(int target_board[ROW][COLUMN], char attack_board[ROW][COLUMN]);
-
-// Função auxiliar para limpar buffer de entrada
-void clearInputBuffer();
-
-// Função para converter entrada no formato "5B" para linha e coluna
 int parsePosition(char* input, int* row, int* column);
 
 #endif // BATTLESHIP_H
